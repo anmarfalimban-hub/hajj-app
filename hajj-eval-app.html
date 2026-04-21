@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>نموذج رصد مساكن الحجاج</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#1a4a7a;--primary-light:#e8f0f8;--accent:#c8a84b;--success:#16a34a;--success-light:#dcfce7;--danger:#dc2626;--danger-light:#fee2e2;--warning:#d97706;--border:#e5e7eb;--gray-light:#f9fafb;--text:#111827;--text-muted:#6b7280;--radius:14px;--radius-sm:9px;--shadow:0 2px 12px rgba(0,0,0,.08);}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Tajawal',sans-serif;background:#eef2f7;color:var(--text);min-height:100vh;padding-bottom:90px;}
+.app-header{background:linear-gradient(135deg,#1a4a7a,#0d3060);color:#fff;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.22);}
+.header-main{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;}
+.header-logo{display:flex;align-items:center;gap:10px;}
+.logo-icon{width:40px;height:40px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.header-title{font-size:16px;font-weight:700;line-height:1.2;}
+.header-subtitle{font-size:11px;opacity:.7;}
+.conn-badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);display:flex;align-items:center;gap:5px;}
+.conn-dot{width:7px;height:7px;border-radius:50%;background:#9ca3af;}
+.conn-dot.online{background:#4ade80;animation:pulse 1.8s infinite;}
+.conn-dot.saving{background:var(--accent);animation:pulse .6s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.progress-wrap{padding:0 16px 12px;}
+.progress-label{display:flex;justify-content:space-between;font-size:11px;opacity:.8;margin-bottom:5px;}
+.progress-bar{height:4px;background:rgba(255,255,255,.2);border-radius:2px;overflow:hidden;}
+.progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s;}
+.screen{display:none;padding:16px;}
+.screen.active{display:block;}
+.card-center{background:#fff;border-radius:var(--radius);padding:28px 22px;box-shadow:var(--shadow);max-width:440px;margin:28px auto;}
+.center-icon{width:72px;height:72px;background:var(--primary-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 16px;}
+.center-title{font-size:20px;font-weight:800;color:var(--primary);text-align:center;margin-bottom:6px;}
+.center-sub{font-size:13px;color:var(--text-muted);text-align:center;margin-bottom:22px;line-height:1.55;}
+.step-box{background:var(--primary-light);border-radius:var(--radius-sm);padding:14px;margin-bottom:13px;}
+.step-title{font-size:13px;font-weight:700;color:var(--primary);margin-bottom:8px;display:flex;align-items:center;gap:7px;}
+.step-num{width:22px;height:22px;background:var(--primary);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.step-body{font-size:12px;color:var(--text-muted);line-height:1.6;}
+code{background:#dbeafe;padding:2px 6px;border-radius:4px;font-size:12px;}
+.form-group{margin-bottom:13px;}
+.form-label{display:block;font-size:13px;font-weight:600;margin-bottom:5px;}
+.req{color:#ef4444;margin-right:3px;}
+.form-input,.form-select,.form-textarea{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'Tajawal',sans-serif;font-size:14px;color:var(--text);background:#fff;transition:border-color .2s;-webkit-appearance:none;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(26,74,122,.1);}
+.form-textarea{resize:vertical;min-height:78px;}
+.btn{padding:12px 20px;border:none;border-radius:var(--radius-sm);font-family:'Tajawal',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;justify-content:center;gap:7px;}
+.btn-block{width:100%;}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-primary:hover{background:#0d3060;}
+.btn-primary:active{transform:scale(.98);}
+.btn-primary:disabled{background:#93c5fd;cursor:not-allowed;}
+.btn-ghost{background:#f3f4f6;color:var(--text-muted);}
+.btn-link{background:none;border:none;color:var(--primary);font-size:12px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;}
+.section-card{background:#fff;border-radius:var(--radius);padding:18px;margin-bottom:14px;box-shadow:var(--shadow);}
+.section-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:2px solid var(--primary-light);}
+.section-num{width:30px;height:30px;background:var(--primary);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+.section-title{font-size:15px;font-weight:700;color:var(--primary);}
+.checklist-item{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:var(--radius-sm);border:1.5px solid var(--border);margin-bottom:9px;transition:all .15s;}
+.checklist-item:last-child{margin-bottom:0;}
+.checklist-item.ans-yes{border-color:var(--success);background:#f0fdf4;}
+.checklist-item.ans-no{border-color:var(--danger);background:#fef2f2;}
+.item-num{width:22px;height:22px;background:#f3f4f6;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--text-muted);flex-shrink:0;}
+.ans-yes .item-num{background:var(--success);color:#fff;}
+.ans-no .item-num{background:var(--danger);color:#fff;}
+.item-text{flex:1;font-size:12.5px;line-height:1.45;}
+.item-btns{display:flex;gap:5px;flex-shrink:0;}
+.tog{padding:5px 11px;border:1.5px solid var(--border);border-radius:20px;font-family:'Tajawal',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:#fff;transition:all .15s;}
+.tog.yes.active{background:var(--success);border-color:var(--success);color:#fff;}
+.tog.no.active{background:var(--danger);border-color:var(--danger);color:#fff;}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:13px;}
+@media(max-width:380px){.info-grid{grid-template-columns:1fr;}}
+.summary-bar{background:#fff;border-radius:var(--radius);padding:15px;margin-bottom:14px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px;}
+.sum-stat{text-align:center;flex:1;}
+.sum-num{font-size:22px;font-weight:800;line-height:1;}
+.sum-lbl{font-size:10px;color:var(--text-muted);margin-top:3px;}
+.sum-div{width:1px;height:36px;background:var(--border);}
+.photo-drop{border:2px dashed var(--border);border-radius:var(--radius-sm);padding:22px;text-align:center;cursor:pointer;background:var(--gray-light);transition:all .2s;}
+.photo-drop:hover{border-color:var(--primary);background:var(--primary-light);}
+.photos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:11px;}
+.photo-thumb{aspect-ratio:1;border-radius:var(--radius-sm);overflow:hidden;position:relative;background:var(--gray-light);}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;}
+.photo-rm{position:absolute;top:4px;left:4px;width:22px;height:22px;background:rgba(0,0,0,.6);border-radius:50%;color:#fff;font-size:14px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);padding:11px 14px;display:flex;gap:9px;box-shadow:0 -4px 12px rgba(0,0,0,.08);z-index:90;}
+.toast{position:fixed;top:80px;right:16px;left:16px;background:var(--primary);color:#fff;padding:11px 15px;border-radius:var(--radius-sm);font-size:14px;font-weight:600;z-index:300;text-align:center;transform:translateY(-14px);opacity:0;transition:all .28s;box-shadow:0 4px 16px rgba(0,0,0,.22);}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{background:var(--success);}
+.toast.error{background:var(--danger);}
+.toast.warning{background:#b45309;}
+.user-chip{display:inline-flex;align-items:center;gap:8px;background:var(--primary-light);border-radius:20px;padding:5px 12px 5px 5px;margin-bottom:13px;}
+.user-av{width:28px;height:28px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;}
+.user-name-chip{font-size:13px;font-weight:600;color:var(--primary);}
+.saving-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:400;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;color:#fff;font-size:15px;font-weight:700;}
+.saving-overlay.show{display:flex;}
+.spinner{width:42px;height:42px;border:4px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+a.open-link{display:inline-flex;align-items:center;gap:5px;margin-top:10px;background:var(--primary);color:#fff;padding:7px 14px;border-radius:7px;font-size:13px;font-weight:700;text-decoration:none;}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="header-main">
+    <div class="header-logo">
+      <div class="logo-icon">🕌</div>
+      <div>
+        <div class="header-title">مساكن الحجاج</div>
+        <div class="header-subtitle">نموذج رصد الملاحظات</div>
+      </div>
+    </div>
+    <div class="conn-badge" id="conn-badge">
+      <div class="conn-dot" id="conn-dot"></div>
+      <span id="conn-text">غير متصل</span>
+    </div>
+  </div>
+  <div class="progress-wrap" id="progress-wrap" style="display:none">
+    <div class="progress-label"><span>تقدم التقييم</span><span id="prog-text">0 / 41</span></div>
+    <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="saving-overlay" id="saving-overlay"><div class="spinner"></div><span id="saving-msg">جاري الحفظ...</span></div>
+
+<!-- ══════════ SCREEN: SETUP ══════════ -->
+<div class="screen active" id="screen-setup">
+  <div class="card-center">
+    <div class="center-icon">⚙️</div>
+    <div class="center-title">إعداد قاعدة البيانات</div>
+    <div class="center-sub">يجب الإعداد مرة واحدة على كل جهاز — جميع الأجهزة ستشارك نفس البيانات</div>
+
+    <div class="step-box">
+      <div class="step-title"><div class="step-num">1</div>أنشئ Bin مجاني على JSONBin</div>
+      <div class="step-body">
+        افتح <strong>jsonbin.io</strong> ← سجّل مجاناً ← اضغط "New Bin" ← اكتب <code>[]</code> ← اضغط Create<br>
+        ثم انسخ الـ <strong>Bin ID</strong> من الرابط<br>
+        من القائمة → Account Settings → انسخ <strong>API Key</strong>
+      </div>
+      <a href="https://jsonbin.io" target="_blank" class="open-link">فتح JSONBin.io ↗</a>
+    </div>
+
+    <div class="step-box">
+      <div class="step-title"><div class="step-num">2</div>أدخل بياناتك</div>
+      <div class="form-group" style="margin-bottom:10px;">
+        <label class="form-label"><span class="req">*</span>API Key</label>
+        <input class="form-input" id="cfg-apikey" placeholder="$2a$10$..." type="password">
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label"><span class="req">*</span>Bin ID</label>
+        <input class="form-input" id="cfg-binid" placeholder="64abc123def...">
+      </div>
+    </div>
+
+    <button class="btn btn-primary btn-block" onclick="testAndSaveConfig()">✓ اختبار الاتصال والحفظ</button>
+    <div style="text-align:center;margin-top:12px;">
+      <button class="btn-link" onclick="skipSetup()">لديّ إعداد محفوظ ←</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SCREEN: LOGIN ══════════ -->
+<div class="screen" id="screen-login">
+  <div class="card-center">
+    <div class="center-icon">👤</div>
+    <div class="center-title">تسجيل الدخول</div>
+    <div class="center-sub">أدخل بياناتك لبدء التقييم</div>
+    <div class="form-group"><label class="form-label"><span class="req">*</span>اسم المشرف</label><input class="form-input" id="login-name" placeholder="الاسم الكامل"></div>
+    <div class="form-group"><label class="form-label"><span class="req">*</span>الجهة / القطاع</label><input class="form-input" id="login-dept" placeholder="مثال: وزارة الحج"></div>
+    <div class="form-group"><label class="form-label">رقم الهاتف</label><input class="form-input" id="login-phone" placeholder="05xxxxxxxx" type="tel"></div>
+    <button class="btn btn-primary btn-block" onclick="doLogin()">دخول ←</button>
+    <div style="text-align:center;margin-top:12px;">
+      <button class="btn-link" onclick="showScreen('screen-setup')">← تغيير إعدادات الاتصال</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SCREEN: FORM ══════════ -->
+<div class="screen" id="screen-form">
+
+  <div id="form-user-chip"></div>
+
+  <div class="section-card">
+    <div class="section-header"><div class="section-num">📋</div><div class="section-title">معلومات المبنى والزيارة</div></div>
+    <div class="info-grid">
+      <div class="form-group"><label class="form-label"><span class="req">*</span>تاريخ الزيارة</label><input type="date" class="form-input" id="visit-date"></div>
+      <div class="form-group"><label class="form-label"><span class="req">*</span>وقت الزيارة</label><input type="time" class="form-input" id="visit-time"></div>
+    </div>
+    <div class="info-grid">
+      <div class="form-group"><label class="form-label"><span class="req">*</span>رقم التصريح</label><input class="form-input" id="permit-no" placeholder="رقم التصريح"></div>
+      <div class="form-group"><label class="form-label">موقع العمارة</label><input class="form-input" id="building-location" placeholder="الحي / المنطقة"></div>
+    </div>
+    <div class="info-grid">
+      <div class="form-group"><label class="form-label">اسم المالك</label><input class="form-input" id="owner-name" placeholder="الاسم"></div>
+      <div class="form-group"><label class="form-label">اسم المستأجر</label><input class="form-input" id="tenant-name" placeholder="الاسم"></div>
+    </div>
+    <div class="info-grid">
+      <div class="form-group"><label class="form-label">رقم عداد الكهرباء</label><input class="form-input" id="meter-no" placeholder="الرقم"></div>
+      <div class="form-group"><label class="form-label">جنسية الحجاج</label><input class="form-input" id="hajj-nationality" placeholder="الجنسية"></div>
+    </div>
+    <div class="form-group"><label class="form-label">اسم الفندق / العمارة</label><input class="form-input" id="building-name" placeholder="الاسم"></div>
+  </div>
+
+  <div id="checklist-container"></div>
+
+  <div class="section-card">
+    <div class="section-header"><div class="section-num">📝</div><div class="section-title">الملاحظات</div></div>
+    <div class="form-group"><label class="form-label">رأي الحاج</label><textarea class="form-textarea" id="hajj-opinion" placeholder="..."></textarea></div>
+    <div class="form-group"><label class="form-label">ملاحظات أخرى</label><textarea class="form-textarea" id="other-notes" placeholder="..."></textarea></div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-header"><div class="section-num">✍️</div><div class="section-title">التوقيعات</div></div>
+    <div class="info-grid">
+      <div class="form-group"><label class="form-label">المشرف الميداني</label><input class="form-input" id="field-supervisor" placeholder="الاسم"></div>
+      <div class="form-group"><label class="form-label">مسؤول المبنى</label><input class="form-input" id="building-supervisor" placeholder="الاسم"></div>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-header"><div class="section-num">📷</div><div class="section-title">الصور التوثيقية</div></div>
+    <div class="photo-drop" onclick="document.getElementById('photo-input').click()">
+      <div style="font-size:30px;margin-bottom:7px;">📸</div>
+      <div style="font-size:13px;color:var(--text-muted);">انقر لإضافة صور</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:3px;">JPG, PNG — حجم أقصى 2 ميجا لكل صورة</div>
+    </div>
+    <input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="handlePhotos(event)">
+    <div class="photos-grid" id="photos-grid"></div>
+  </div>
+
+  <div class="summary-bar">
+    <div class="sum-stat"><div class="sum-num" id="sum-yes" style="color:var(--success)">0</div><div class="sum-lbl">✅ متوفر</div></div>
+    <div class="sum-div"></div>
+    <div class="sum-stat"><div class="sum-num" id="sum-no" style="color:var(--danger)">0</div><div class="sum-lbl">❌ غير متوفر</div></div>
+    <div class="sum-div"></div>
+    <div class="sum-stat"><div class="sum-num" id="sum-pct" style="color:var(--primary)">0%</div><div class="sum-lbl">🏠 جاهزية</div></div>
+    <div class="sum-div"></div>
+    <div class="sum-stat"><div class="sum-num" id="sum-rem" style="color:var(--accent)">41</div><div class="sum-lbl">⏳ متبقي</div></div>
+  </div>
+
+</div>
+
+<div class="bottom-nav" id="bottom-nav" style="display:none">
+  <button class="btn btn-ghost" onclick="resetForm()" style="flex:1">🗑️ مسح</button>
+  <button class="btn btn-primary" id="save-btn" onclick="saveRecord()" style="flex:2.5">💾 حفظ وإرسال</button>
+</div>
+
+<script>
+const ITEMS=[{id:1,text:'توفر تصريح'},{id:2,text:'وجود تكدس حجاج المبنى'},{id:3,text:'توفر كاميرات مراقبة للمباني التي تزيد طاقتها عن 500 حاج'},{id:4,text:'وجود حارس أمن سعودي في المبنى'},{id:5,text:'توفير برادات لماء زمزم في مدخل المبنى'},{id:6,text:'التكييف والتهوية في كافة الغرف والممرات'},{id:7,text:'صلاحية دورات المياه وتوفر عبوة ثابتة للصابون'},{id:8,text:'توفر وسائل السلامة (سطول رمل وطفايات حريق)'},{id:9,text:'سخانات المياه'},{id:10,text:'شفاطات للهواء'},{id:11,text:'وجود طبق في أماكن غير مخصصة'},{id:12,text:'توفر أكواب ذات استخدام واحد'},{id:13,text:'توفر ستائر لجميع الغرف'},{id:14,text:'وجود مواد قابلة للإشتعال'},{id:15,text:'وجود قواطع خشبية بين الغرف'},{id:16,text:'توفر لوحة إرشادات السلامة وأرقام الطوارئ بلغة مستخدمي المبنى'},{id:17,text:'الطرق والمداخل متسعة لمرور آليات الإطفاء والإنقاذ'},{id:18,text:'سلامة الحوائط والأسقف من الشروخ والترشيح والتشققات'},{id:19,text:'التوافذ سليمة وبها سلك يمنع دخول الحشرات'},{id:20,text:'توفر حوض غسيل في كل مطبخ من المبنى'},{id:21,text:'سلامة المصعد ووجود عقد صيانة'},{id:22,text:'وجود افتراش بين الممرات'},{id:23,text:'استخدام الميزانين والأسطح للإسكان والتخزين'},{id:24,text:'استخدام أماكن مخصصة وتحويلها لغرف نوم'},{id:25,text:'وجود تسرب مياه من الخزان (السفلي - العلوي)'},{id:26,text:'طبلونات أو تمديدات كهرباء مكشوفة'},{id:27,text:'توفر لوحات إرشادية مضاءة لسلالم الطوارئ وكشافات كافية'},{id:28,text:'التأكد من تشغيل التيار في كافة عناصر المبنى'},{id:29,text:'توفر سلات مهملات في الغرف وحاويات حريق'},{id:30,text:'توفر غطاء محكم للخزان الأرضي'},{id:31,text:'توفر ملصق اتجاه القبلة في كل غرفة'},{id:32,text:'توفير برادات لماء عادي (تعمل)'},{id:33,text:'توفر مولد احتياطي يعمل بكفاءة وله عقد ساري'},{id:34,text:'توفر الإضاءة الكافية في أجزاء المبنى'},{id:35,text:'تركيب أدوات ترشيد المياه في المطابخ ودورات المياه'},{id:36,text:'وجود سرير معدني ومخدة ولحاف وخزانة في كل غرفة'},{id:37,text:'وجود عوائق أمام مخارج الطوارئ'},{id:38,text:'توفر لوحة عند كل غرفة برقمها وعدد المسموح بإسكانهم'},{id:39,text:'توفر وحدة استقبال وصندوق أمانات وصندوق مفاتيح'},{id:40,text:'توفر أغطية بالوعات سليمة محكمة الإغلاق بشبك يمنع الحشرات'},{id:41,text:'توفر سجاد يتناسب مع حجم الغرفة أو سجادة صلاة'}];
+const SECTIONS=[{title:'السلامة والأمن',icon:'🛡️',ids:[1,2,3,4,8,9,16,17,18]},{title:'المرافق والخدمات',icon:'🔧',ids:[5,6,7,10,12,13,19,20,21]},{title:'الكهرباء والتجهيزات',icon:'⚡',ids:[11,26,27,28,29,30,32,33,34]},{title:'الغرف والمحتويات',icon:'🛏️',ids:[31,36,38,39,40,41]},{title:'التدقيق والمخالفات',icon:'⚠️',ids:[14,15,22,23,24,25,35,37]}];
+const CFG_KEY='hajj_db_config';const USER_KEY='hajj_user';
+let cfg=null,currentUser=null,answers={},photos=[];
+
+window.onload=async()=>{
+  cfg=JSON.parse(localStorage.getItem(CFG_KEY)||'null');
+  const su=JSON.parse(localStorage.getItem(USER_KEY)||'null');
+  if(!cfg){showScreen('screen-setup');return;}
+  if(!su){showScreen('screen-login');return;}
+  currentUser=su;
+  showFormScreen();
+  checkConn();
+};
+
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+function jsonbinHeaders(apiKey){return{'X-Master-Key':apiKey,'X-Bin-Meta':'false'};}
+function jsonbinUrl(binId){return`https://api.jsonbin.io/v3/b/${binId}`;}
+
+async function testAndSaveConfig(){
+  const apiKey=document.getElementById('cfg-apikey').value.trim();
+  const binId=document.getElementById('cfg-binid').value.trim();
+  if(!apiKey||!binId){toast('⚠️ أدخل الـ API Key والـ Bin ID','warning');return;}
+  showSaving('جاري اختبار الاتصال...');
+  try{
+    const res=await fetch(jsonbinUrl(binId),{headers:jsonbinHeaders(apiKey)});
+    if(!res.ok)throw new Error(res.status);
+    cfg={apiKey,binId};
+    localStorage.setItem(CFG_KEY,JSON.stringify(cfg));
+    hideSaving();
+    toast('✅ تم الاتصال! انتقل لتسجيل الدخول','success');
+    setTimeout(()=>showScreen('screen-login'),1300);
+  }catch(e){hideSaving();toast('❌ فشل الاتصال — تحقق من البيانات','error');}
+}
+
+function skipSetup(){if(!cfg){toast('⚠️ لا يوجد إعداد محفوظ','warning');return;}showScreen('screen-login');}
+
+async function checkConn(){
+  if(!cfg)return;
+  try{const r=await fetch(jsonbinUrl(cfg.binId),{headers:jsonbinHeaders(cfg.apiKey)});setConn(r.ok);}
+  catch{setConn(false);}
+}
+
+function setConn(online,saving=false){
+  const dot=document.getElementById('conn-dot');const txt=document.getElementById('conn-text');
+  if(saving){dot.className='conn-dot saving';txt.textContent='جاري الحفظ...';return;}
+  if(online){dot.className='conn-dot online';txt.textContent='متصل ✓';}
+  else{dot.className='conn-dot';txt.textContent='غير متصل';}
+}
+
+function doLogin(){
+  const name=document.getElementById('login-name').value.trim();
+  const dept=document.getElementById('login-dept').value.trim();
+  const phone=document.getElementById('login-phone').value.trim();
+  if(!name||!dept){toast('⚠️ أدخل الاسم والجهة','warning');return;}
+  currentUser={name,dept,phone,loginTime:new Date().toISOString()};
+  localStorage.setItem(USER_KEY,JSON.stringify(currentUser));
+  showFormScreen();
+}
+
+function showFormScreen(){
+  buildChecklist();setDefaultDT();
+  const initials=currentUser.name.split(' ').slice(0,2).map(w=>w[0]).join('');
+  document.getElementById('form-user-chip').innerHTML=`<div class="user-chip"><div class="user-av">${initials}</div><div class="user-name-chip">${currentUser.name} — ${currentUser.dept}</div></div>`;
+  showScreen('screen-form');
+  document.getElementById('bottom-nav').style.display='flex';
+  document.getElementById('progress-wrap').style.display='block';
+  updateSummary();updateProgress();
+}
+
+function buildChecklist(){
+  const c=document.getElementById('checklist-container');c.innerHTML='';
+  SECTIONS.forEach(sec=>{
+    const d=document.createElement('div');d.className='section-card';
+    d.innerHTML=`<div class="section-header"><div class="section-num">${sec.icon}</div><div class="section-title">${sec.title}</div></div>`
+      +sec.ids.map(id=>{const it=ITEMS.find(i=>i.id===id);return`<div class="checklist-item" id="row-${id}"><div class="item-num" id="num-${id}">${id}</div><div class="item-text">${it.text}</div><div class="item-btns"><button class="tog yes" id="yes-${id}" onclick="setAns(${id},true)">نعم</button><button class="tog no" id="no-${id}" onclick="setAns(${id},false)">لا</button></div></div>`;}).join('');
+    c.appendChild(d);
+  });
+}
+
+function setAns(id,val){
+  answers[id]=val;
+  document.getElementById(`row-${id}`).className='checklist-item '+(val?'ans-yes':'ans-no');
+  document.getElementById(`yes-${id}`).className='tog yes'+(val?' active':'');
+  document.getElementById(`no-${id}`).className='tog no'+(!val?' active':'');
+  updateSummary();updateProgress();
+}
+
+function setDefaultDT(){const n=new Date();document.getElementById('visit-date').value=n.toISOString().split('T')[0];document.getElementById('visit-time').value=n.toTimeString().slice(0,5);}
+function updateProgress(){const d=Object.keys(answers).length;document.getElementById('prog-fill').style.width=Math.round(d/41*100)+'%';document.getElementById('prog-text').textContent=`${d} / 41`;}
+function updateSummary(){const v=Object.values(answers);const y=v.filter(Boolean).length;const n=v.length-y;document.getElementById('sum-yes').textContent=y;document.getElementById('sum-no').textContent=n;document.getElementById('sum-pct').textContent=(v.length?Math.round(y/v.length*100):0)+'%';document.getElementById('sum-rem').textContent=41-v.length;}
+
+function handlePhotos(e){
+  Array.from(e.target.files).forEach(file=>{
+    if(file.size>2*1024*1024){toast(`⚠️ ${file.name} أكبر من 2 ميجا`,'warning');return;}
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const img=new Image();
+      img.onload=()=>{
+        const MAX=800;let w=img.width,h=img.height;
+        if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
+        const cv=document.createElement('canvas');cv.width=w;cv.height=h;
+        cv.getContext('2d').drawImage(img,0,0,w,h);
+        photos.push({name:file.name,data:cv.toDataURL('image/jpeg',.65),time:new Date().toISOString()});
+        renderPhotos();
+      };img.src=ev.target.result;
+    };reader.readAsDataURL(file);
+  });e.target.value='';
+}
+
+function renderPhotos(){document.getElementById('photos-grid').innerHTML=photos.map((p,i)=>`<div class="photo-thumb"><img src="${p.data}"><button class="photo-rm" onclick="photos.splice(${i},1);renderPhotos()">×</button></div>`).join('');}
+
+async function saveRecord(){
+  const permitNo=document.getElementById('permit-no').value.trim();
+  const visitDate=document.getElementById('visit-date').value;
+  if(!permitNo||!visitDate){toast('⚠️ أدخل رقم التصريح والتاريخ','warning');return;}
+  const v=Object.values(answers);const y=v.filter(Boolean).length;
+  const record={
+    id:Date.now().toString(),savedAt:new Date().toISOString(),user:currentUser,
+    visitDate,visitTime:document.getElementById('visit-time').value,permitNo,
+    buildingLocation:document.getElementById('building-location').value,
+    buildingName:document.getElementById('building-name').value,
+    ownerName:document.getElementById('owner-name').value,tenantName:document.getElementById('tenant-name').value,
+    meterNo:document.getElementById('meter-no').value,hajjNationality:document.getElementById('hajj-nationality').value,
+    fieldSupervisor:document.getElementById('field-supervisor').value,buildingSupervisor:document.getElementById('building-supervisor').value,
+    hajjOpinion:document.getElementById('hajj-opinion').value,otherNotes:document.getElementById('other-notes').value,
+    answers:{...answers},photos:photos.slice(),
+    stats:{yes:y,no:v.length-y,total:41,answered:v.length,pct:v.length?Math.round(y/v.length*100):0}
+  };
+  setConn(false,true);showSaving('جاري الإرسال...');
+  document.getElementById('save-btn').disabled=true;
+  try{
+    const getRes=await fetch(jsonbinUrl(cfg.binId),{headers:jsonbinHeaders(cfg.apiKey)});
+    const getData=await getRes.json();
+    const raw=getData.record||getData;
+    let existing=Array.isArray(raw)?raw:Array.isArray(raw.data)?raw.data:[];
+    existing.push(record);
+    const putRes=await fetch(jsonbinUrl(cfg.binId),{
+      method:'PUT',headers:{...jsonbinHeaders(cfg.apiKey),'Content-Type':'application/json'},
+      body:JSON.stringify({data:existing})
+    });
+    if(!putRes.ok)throw new Error(putRes.status);
+    setConn(true);hideSaving();document.getElementById('save-btn').disabled=false;
+    toast('✅ تم الحفظ والإرسال بنجاح!','success');
+    setTimeout(()=>{if(confirm('تم الحفظ! هل تريد بدء تقييم جديد؟'))resetForm();},700);
+  }catch(err){
+    hideSaving();setConn(false);document.getElementById('save-btn').disabled=false;
+    const q=JSON.parse(localStorage.getItem('hajj_offline')||'[]');q.push(record);localStorage.setItem('hajj_offline',JSON.stringify(q));
+    toast('⚠️ حُفظ محلياً — تحقق من الاتصال','warning');
+  }
+}
+
+function resetForm(){
+  answers={};photos=[];document.getElementById('photos-grid').innerHTML='';
+  ['permit-no','building-location','building-name','owner-name','tenant-name','meter-no','hajj-nationality','field-supervisor','building-supervisor','hajj-opinion','other-notes'].forEach(id=>document.getElementById(id).value='');
+  setDefaultDT();buildChecklist();updateSummary();updateProgress();window.scrollTo(0,0);toast('🔄 تم مسح النموذج');
+}
+
+function showSaving(msg){document.getElementById('saving-msg').textContent=msg;document.getElementById('saving-overlay').classList.add('show');}
+function hideSaving(){document.getElementById('saving-overlay').classList.remove('show');}
+function toast(msg,type=''){const el=document.getElementById('toast');el.textContent=msg;el.className='toast show'+(type?' '+type:'');setTimeout(()=>el.className='toast',2900);}
+</script>
+</body>
+</html>
