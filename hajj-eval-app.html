@@ -16,10 +16,8 @@ body{font-family:'Tajawal',sans-serif;background:#eef2f7;color:var(--text);min-h
 .header-title{font-size:16px;font-weight:700;line-height:1.2;}
 .header-subtitle{font-size:11px;opacity:.7;}
 .conn-badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);display:flex;align-items:center;gap:5px;}
-.conn-dot{width:7px;height:7px;border-radius:50%;background:#9ca3af;}
-.conn-dot.online{background:#4ade80;animation:pulse 1.8s infinite;}
-.conn-dot.saving{background:var(--accent);animation:pulse .6s infinite;}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.cdot{width:7px;height:7px;border-radius:50%;background:#9ca3af;}
+.cdot.ok{background:#4ade80;}
 .progress-wrap{padding:0 16px 12px;}
 .progress-label{display:flex;justify-content:space-between;font-size:11px;opacity:.8;margin-bottom:5px;}
 .progress-bar{height:4px;background:rgba(255,255,255,.2);border-radius:2px;overflow:hidden;}
@@ -44,7 +42,6 @@ code{background:#dbeafe;padding:2px 6px;border-radius:4px;font-size:12px;}
 .btn{padding:12px 20px;border:none;border-radius:var(--radius-sm);font-family:'Tajawal',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;justify-content:center;gap:7px;}
 .btn-block{width:100%;}
 .btn-primary{background:var(--primary);color:#fff;}
-.btn-primary:hover{background:#0d3060;}
 .btn-primary:active{transform:scale(.98);}
 .btn-primary:disabled{background:#93c5fd;cursor:not-allowed;}
 .btn-ghost{background:#f3f4f6;color:var(--text-muted);}
@@ -86,12 +83,14 @@ code{background:#dbeafe;padding:2px 6px;border-radius:4px;font-size:12px;}
 .toast.warning{background:#b45309;}
 .user-chip{display:inline-flex;align-items:center;gap:8px;background:var(--primary-light);border-radius:20px;padding:5px 12px 5px 5px;margin-bottom:13px;}
 .user-av{width:28px;height:28px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;}
-.user-name-chip{font-size:13px;font-weight:600;color:var(--primary);}
 .saving-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:400;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;color:#fff;font-size:15px;font-weight:700;}
 .saving-overlay.show{display:flex;}
 .spinner{width:42px;height:42px;border:4px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
 a.open-link{display:inline-flex;align-items:center;gap:5px;margin-top:10px;background:var(--primary);color:#fff;padding:7px 14px;border-radius:7px;font-size:13px;font-weight:700;text-decoration:none;}
+.url-input-wrap{position:relative;}
+.url-input-wrap input{padding-left:36px;font-size:12px;}
+.paste-btn{position:absolute;left:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;}
 </style>
 </head>
 <body>
@@ -106,8 +105,8 @@ a.open-link{display:inline-flex;align-items:center;gap:5px;margin-top:10px;backg
       </div>
     </div>
     <div class="conn-badge" id="conn-badge">
-      <div class="conn-dot" id="conn-dot"></div>
-      <span id="conn-text">غير متصل</span>
+      <div class="cdot" id="cdot"></div>
+      <span id="conn-text">جاهز</span>
     </div>
   </div>
   <div class="progress-wrap" id="progress-wrap" style="display:none">
@@ -117,45 +116,54 @@ a.open-link{display:inline-flex;align-items:center;gap:5px;margin-top:10px;backg
 </div>
 
 <div class="toast" id="toast"></div>
-<div class="saving-overlay" id="saving-overlay"><div class="spinner"></div><span id="saving-msg">جاري الحفظ...</span></div>
+<div class="saving-overlay" id="saving-overlay"><div class="spinner"></div><span id="saving-msg">جاري الإرسال...</span></div>
 
-<!-- ══════════ SCREEN: SETUP ══════════ -->
+<!-- ══ SCREEN: SETUP ══ -->
 <div class="screen active" id="screen-setup">
   <div class="card-center">
-    <div class="center-icon">⚙️</div>
-    <div class="center-title">إعداد قاعدة البيانات</div>
-    <div class="center-sub">يجب الإعداد مرة واحدة على كل جهاز — جميع الأجهزة ستشارك نفس البيانات</div>
+    <div class="center-icon">🔗</div>
+    <div class="center-title">إعداد الاتصال</div>
+    <div class="center-sub">أدخل رابط Google Script مرة واحدة فقط — وسيعمل على جميع الأجهزة تلقائياً</div>
 
     <div class="step-box">
-      <div class="step-title"><div class="step-num">1</div>أنشئ Bin مجاني على JSONBin</div>
+      <div class="step-title"><div class="step-num">1</div>افتح Google Sheet وانسخ الرابط</div>
       <div class="step-body">
-        افتح <strong>jsonbin.io</strong> ← سجّل مجاناً ← اضغط "New Bin" ← اكتب <code>[]</code> ← اضغط Create<br>
-        ثم انسخ الـ <strong>Bin ID</strong> من الرابط<br>
-        من القائمة → Account Settings → انسخ <strong>API Key</strong>
-      </div>
-      <a href="https://jsonbin.io" target="_blank" class="open-link">فتح JSONBin.io ↗</a>
-    </div>
-
-    <div class="step-box">
-      <div class="step-title"><div class="step-num">2</div>أدخل بياناتك</div>
-      <div class="form-group" style="margin-bottom:10px;">
-        <label class="form-label"><span class="req">*</span>API Key</label>
-        <input class="form-input" id="cfg-apikey" placeholder="$2a$10$..." type="password">
-      </div>
-      <div class="form-group" style="margin-bottom:0;">
-        <label class="form-label"><span class="req">*</span>Bin ID</label>
-        <input class="form-input" id="cfg-binid" placeholder="64abc123def...">
+        سيُرسل لك المسؤول رابط الـ Script الخاص بهذا النظام — فقط الصقه في الحقل أدناه
       </div>
     </div>
 
-    <button class="btn btn-primary btn-block" onclick="testAndSaveConfig()">✓ اختبار الاتصال والحفظ</button>
-    <div style="text-align:center;margin-top:12px;">
-      <button class="btn-link" onclick="skipSetup()">لديّ إعداد محفوظ ←</button>
+    <div class="form-group">
+      <label class="form-label"><span class="req">*</span>رابط Google Script (Script URL)</label>
+      <div class="url-input-wrap">
+        <input class="form-input" id="cfg-url"
+          placeholder="https://script.google.com/macros/s/..."
+          type="url" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="font-size:12px;">
+        <button class="paste-btn" onclick="pasteUrl()" title="لصق">📋</button>
+      </div>
     </div>
+
+    <button class="btn btn-primary btn-block" onclick="saveConfig()">✓ حفظ والمتابعة</button>
+
+    <div style="text-align:center;margin-top:14px;">
+      <button class="btn-link" onclick="clearAndReset()" style="color:#dc2626;font-size:11px;">مسح الإعداد المحفوظ</button>
+    </div>
+
+    <!-- For admin only -->
+    <details style="margin-top:18px;border-top:1px solid var(--border);padding-top:14px;">
+      <summary style="font-size:12px;color:var(--text-muted);cursor:pointer;font-weight:600;">⚙️ للمسؤول: كيفية إنشاء الـ Script</summary>
+      <div style="margin-top:12px;font-size:12px;color:var(--text-muted);line-height:1.7;">
+        1. افتح <a href="https://sheets.google.com" target="_blank" style="color:var(--primary)">Google Sheets</a> ← أنشئ جدول جديد<br>
+        2. من القائمة: <strong>Extensions → Apps Script</strong><br>
+        3. احذف الكود الموجود والصق الكود المرفق<br>
+        4. اضغط <strong>Deploy → New deployment</strong><br>
+        5. اختر <strong>Web app</strong> ← Execute as: <strong>Me</strong> ← Who has access: <strong>Anyone</strong><br>
+        6. اضغط <strong>Deploy</strong> ← انسخ الرابط ووزّعه على المشرفين
+      </div>
+    </details>
   </div>
 </div>
 
-<!-- ══════════ SCREEN: LOGIN ══════════ -->
+<!-- ══ SCREEN: LOGIN ══ -->
 <div class="screen" id="screen-login">
   <div class="card-center">
     <div class="center-icon">👤</div>
@@ -166,14 +174,13 @@ a.open-link{display:inline-flex;align-items:center;gap:5px;margin-top:10px;backg
     <div class="form-group"><label class="form-label">رقم الهاتف</label><input class="form-input" id="login-phone" placeholder="05xxxxxxxx" type="tel"></div>
     <button class="btn btn-primary btn-block" onclick="doLogin()">دخول ←</button>
     <div style="text-align:center;margin-top:12px;">
-      <button class="btn-link" onclick="showScreen('screen-setup')">← تغيير إعدادات الاتصال</button>
+      <button class="btn-link" onclick="showScreen('screen-setup')">← تغيير رابط الاتصال</button>
     </div>
   </div>
 </div>
 
-<!-- ══════════ SCREEN: FORM ══════════ -->
+<!-- ══ SCREEN: FORM ══ -->
 <div class="screen" id="screen-form">
-
   <div id="form-user-chip"></div>
 
   <div class="section-card">
@@ -218,7 +225,7 @@ a.open-link{display:inline-flex;align-items:center;gap:5px;margin-top:10px;backg
     <div class="photo-drop" onclick="document.getElementById('photo-input').click()">
       <div style="font-size:30px;margin-bottom:7px;">📸</div>
       <div style="font-size:13px;color:var(--text-muted);">انقر لإضافة صور</div>
-      <div style="font-size:11px;color:var(--text-muted);margin-top:3px;">JPG, PNG — حجم أقصى 2 ميجا لكل صورة</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:3px;">JPG, PNG — حجم أقصى 2 ميجا</div>
     </div>
     <input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="handlePhotos(event)">
     <div class="photos-grid" id="photos-grid"></div>
@@ -233,7 +240,6 @@ a.open-link{display:inline-flex;align-items:center;gap:5px;margin-top:10px;backg
     <div class="sum-div"></div>
     <div class="sum-stat"><div class="sum-num" id="sum-rem" style="color:var(--accent)">41</div><div class="sum-lbl">⏳ متبقي</div></div>
   </div>
-
 </div>
 
 <div class="bottom-nav" id="bottom-nav" style="display:none">
@@ -244,53 +250,44 @@ a.open-link{display:inline-flex;align-items:center;gap:5px;margin-top:10px;backg
 <script>
 const ITEMS=[{id:1,text:'توفر تصريح'},{id:2,text:'وجود تكدس حجاج المبنى'},{id:3,text:'توفر كاميرات مراقبة للمباني التي تزيد طاقتها عن 500 حاج'},{id:4,text:'وجود حارس أمن سعودي في المبنى'},{id:5,text:'توفير برادات لماء زمزم في مدخل المبنى'},{id:6,text:'التكييف والتهوية في كافة الغرف والممرات'},{id:7,text:'صلاحية دورات المياه وتوفر عبوة ثابتة للصابون'},{id:8,text:'توفر وسائل السلامة (سطول رمل وطفايات حريق)'},{id:9,text:'سخانات المياه'},{id:10,text:'شفاطات للهواء'},{id:11,text:'وجود طبق في أماكن غير مخصصة'},{id:12,text:'توفر أكواب ذات استخدام واحد'},{id:13,text:'توفر ستائر لجميع الغرف'},{id:14,text:'وجود مواد قابلة للإشتعال'},{id:15,text:'وجود قواطع خشبية بين الغرف'},{id:16,text:'توفر لوحة إرشادات السلامة وأرقام الطوارئ بلغة مستخدمي المبنى'},{id:17,text:'الطرق والمداخل متسعة لمرور آليات الإطفاء والإنقاذ'},{id:18,text:'سلامة الحوائط والأسقف من الشروخ والترشيح والتشققات'},{id:19,text:'التوافذ سليمة وبها سلك يمنع دخول الحشرات'},{id:20,text:'توفر حوض غسيل في كل مطبخ من المبنى'},{id:21,text:'سلامة المصعد ووجود عقد صيانة'},{id:22,text:'وجود افتراش بين الممرات'},{id:23,text:'استخدام الميزانين والأسطح للإسكان والتخزين'},{id:24,text:'استخدام أماكن مخصصة وتحويلها لغرف نوم'},{id:25,text:'وجود تسرب مياه من الخزان (السفلي - العلوي)'},{id:26,text:'طبلونات أو تمديدات كهرباء مكشوفة'},{id:27,text:'توفر لوحات إرشادية مضاءة لسلالم الطوارئ وكشافات كافية'},{id:28,text:'التأكد من تشغيل التيار في كافة عناصر المبنى'},{id:29,text:'توفر سلات مهملات في الغرف وحاويات حريق'},{id:30,text:'توفر غطاء محكم للخزان الأرضي'},{id:31,text:'توفر ملصق اتجاه القبلة في كل غرفة'},{id:32,text:'توفير برادات لماء عادي (تعمل)'},{id:33,text:'توفر مولد احتياطي يعمل بكفاءة وله عقد ساري'},{id:34,text:'توفر الإضاءة الكافية في أجزاء المبنى'},{id:35,text:'تركيب أدوات ترشيد المياه في المطابخ ودورات المياه'},{id:36,text:'وجود سرير معدني ومخدة ولحاف وخزانة في كل غرفة'},{id:37,text:'وجود عوائق أمام مخارج الطوارئ'},{id:38,text:'توفر لوحة عند كل غرفة برقمها وعدد المسموح بإسكانهم'},{id:39,text:'توفر وحدة استقبال وصندوق أمانات وصندوق مفاتيح'},{id:40,text:'توفر أغطية بالوعات سليمة محكمة الإغلاق بشبك يمنع الحشرات'},{id:41,text:'توفر سجاد يتناسب مع حجم الغرفة أو سجادة صلاة'}];
 const SECTIONS=[{title:'السلامة والأمن',icon:'🛡️',ids:[1,2,3,4,8,9,16,17,18]},{title:'المرافق والخدمات',icon:'🔧',ids:[5,6,7,10,12,13,19,20,21]},{title:'الكهرباء والتجهيزات',icon:'⚡',ids:[11,26,27,28,29,30,32,33,34]},{title:'الغرف والمحتويات',icon:'🛏️',ids:[31,36,38,39,40,41]},{title:'التدقيق والمخالفات',icon:'⚠️',ids:[14,15,22,23,24,25,35,37]}];
-const CFG_KEY='hajj_db_config';const USER_KEY='hajj_user';
-let cfg=null,currentUser=null,answers={},photos=[];
+const CFG_KEY='hajj_script_url_v3';
+const USER_KEY='hajj_user_v3';
+let scriptUrl=null,currentUser=null,answers={},photos=[];
 
-window.onload=async()=>{
-  cfg=JSON.parse(localStorage.getItem(CFG_KEY)||'null');
+window.onload=()=>{
+  scriptUrl=localStorage.getItem(CFG_KEY)||null;
   const su=JSON.parse(localStorage.getItem(USER_KEY)||'null');
-  if(!cfg){showScreen('screen-setup');return;}
+  if(!scriptUrl){showScreen('screen-setup');return;}
   if(!su){showScreen('screen-login');return;}
   currentUser=su;
   showFormScreen();
-  checkConn();
 };
 
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 
-function jsonbinHeaders(apiKey){return{'X-Master-Key':apiKey,'X-Bin-Meta':'false'};}
-function jsonbinUrl(binId){return`https://api.jsonbin.io/v3/b/${binId}`;}
-
-async function testAndSaveConfig(){
-  const apiKey=document.getElementById('cfg-apikey').value.trim();
-  const binId=document.getElementById('cfg-binid').value.trim();
-  if(!apiKey||!binId){toast('⚠️ أدخل الـ API Key والـ Bin ID','warning');return;}
-  showSaving('جاري اختبار الاتصال...');
-  try{
-    const res=await fetch(jsonbinUrl(binId),{headers:jsonbinHeaders(apiKey)});
-    if(!res.ok)throw new Error(res.status);
-    cfg={apiKey,binId};
-    localStorage.setItem(CFG_KEY,JSON.stringify(cfg));
-    hideSaving();
-    toast('✅ تم الاتصال! انتقل لتسجيل الدخول','success');
-    setTimeout(()=>showScreen('screen-login'),1300);
-  }catch(e){hideSaving();toast('❌ فشل الاتصال — تحقق من البيانات','error');}
+async function pasteUrl(){
+  try{const t=await navigator.clipboard.readText();document.getElementById('cfg-url').value=t.trim();}
+  catch{toast('اضغط مطولاً على الحقل ثم لصق','warning');}
 }
 
-function skipSetup(){if(!cfg){toast('⚠️ لا يوجد إعداد محفوظ','warning');return;}showScreen('screen-login');}
-
-async function checkConn(){
-  if(!cfg)return;
-  try{const r=await fetch(jsonbinUrl(cfg.binId),{headers:jsonbinHeaders(cfg.apiKey)});setConn(r.ok);}
-  catch{setConn(false);}
+function saveConfig(){
+  const url=document.getElementById('cfg-url').value.trim();
+  if(!url||!url.startsWith('https://script.google.com')){
+    toast('⚠️ أدخل رابط Google Script صحيح يبدأ بـ https://script.google.com','warning');
+    return;
+  }
+  scriptUrl=url;
+  localStorage.setItem(CFG_KEY,url);
+  toast('✅ تم حفظ الرابط','success');
+  setTimeout(()=>showScreen('screen-login'),800);
 }
 
-function setConn(online,saving=false){
-  const dot=document.getElementById('conn-dot');const txt=document.getElementById('conn-text');
-  if(saving){dot.className='conn-dot saving';txt.textContent='جاري الحفظ...';return;}
-  if(online){dot.className='conn-dot online';txt.textContent='متصل ✓';}
-  else{dot.className='conn-dot';txt.textContent='غير متصل';}
+function clearAndReset(){
+  localStorage.removeItem(CFG_KEY);localStorage.removeItem(USER_KEY);
+  scriptUrl=null;currentUser=null;
+  document.getElementById('cfg-url').value='';
+  showScreen('screen-setup');
+  toast('تم المسح','warning');
 }
 
 function doLogin(){
@@ -306,11 +303,13 @@ function doLogin(){
 function showFormScreen(){
   buildChecklist();setDefaultDT();
   const initials=currentUser.name.split(' ').slice(0,2).map(w=>w[0]).join('');
-  document.getElementById('form-user-chip').innerHTML=`<div class="user-chip"><div class="user-av">${initials}</div><div class="user-name-chip">${currentUser.name} — ${currentUser.dept}</div></div>`;
+  document.getElementById('form-user-chip').innerHTML=`<div class="user-chip"><div class="user-av">${initials}</div><div style="font-size:13px;font-weight:600;color:var(--primary);">${currentUser.name} — ${currentUser.dept}</div></div>`;
   showScreen('screen-form');
   document.getElementById('bottom-nav').style.display='flex';
   document.getElementById('progress-wrap').style.display='block';
   updateSummary();updateProgress();
+  document.getElementById('cdot').className='cdot ok';
+  document.getElementById('conn-text').textContent='جاهز';
 }
 
 function buildChecklist(){
@@ -333,7 +332,7 @@ function setAns(id,val){
 
 function setDefaultDT(){const n=new Date();document.getElementById('visit-date').value=n.toISOString().split('T')[0];document.getElementById('visit-time').value=n.toTimeString().slice(0,5);}
 function updateProgress(){const d=Object.keys(answers).length;document.getElementById('prog-fill').style.width=Math.round(d/41*100)+'%';document.getElementById('prog-text').textContent=`${d} / 41`;}
-function updateSummary(){const v=Object.values(answers);const y=v.filter(Boolean).length;const n=v.length-y;document.getElementById('sum-yes').textContent=y;document.getElementById('sum-no').textContent=n;document.getElementById('sum-pct').textContent=(v.length?Math.round(y/v.length*100):0)+'%';document.getElementById('sum-rem').textContent=41-v.length;}
+function updateSummary(){const v=Object.values(answers);const y=v.filter(Boolean).length;document.getElementById('sum-yes').textContent=y;document.getElementById('sum-no').textContent=v.length-y;document.getElementById('sum-pct').textContent=(v.length?Math.round(y/v.length*100):0)+'%';document.getElementById('sum-rem').textContent=41-v.length;}
 
 function handlePhotos(e){
   Array.from(e.target.files).forEach(file=>{
@@ -342,17 +341,16 @@ function handlePhotos(e){
     reader.onload=ev=>{
       const img=new Image();
       img.onload=()=>{
-        const MAX=800;let w=img.width,h=img.height;
+        const MAX=600;let w=img.width,h=img.height;
         if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
         const cv=document.createElement('canvas');cv.width=w;cv.height=h;
         cv.getContext('2d').drawImage(img,0,0,w,h);
-        photos.push({name:file.name,data:cv.toDataURL('image/jpeg',.65),time:new Date().toISOString()});
+        photos.push({name:file.name,data:cv.toDataURL('image/jpeg',.6),time:new Date().toISOString()});
         renderPhotos();
       };img.src=ev.target.result;
     };reader.readAsDataURL(file);
   });e.target.value='';
 }
-
 function renderPhotos(){document.getElementById('photos-grid').innerHTML=photos.map((p,i)=>`<div class="photo-thumb"><img src="${p.data}"><button class="photo-rm" onclick="photos.splice(${i},1);renderPhotos()">×</button></div>`).join('');}
 
 async function saveRecord(){
@@ -365,91 +363,130 @@ async function saveRecord(){
     visitDate,visitTime:document.getElementById('visit-time').value,permitNo,
     buildingLocation:document.getElementById('building-location').value,
     buildingName:document.getElementById('building-name').value,
-    ownerName:document.getElementById('owner-name').value,tenantName:document.getElementById('tenant-name').value,
-    meterNo:document.getElementById('meter-no').value,hajjNationality:document.getElementById('hajj-nationality').value,
-    fieldSupervisor:document.getElementById('field-supervisor').value,buildingSupervisor:document.getElementById('building-supervisor').value,
-    hajjOpinion:document.getElementById('hajj-opinion').value,otherNotes:document.getElementById('other-notes').value,
-    answers:{...answers},photos:photos.slice(),
+    ownerName:document.getElementById('owner-name').value,
+    tenantName:document.getElementById('tenant-name').value,
+    meterNo:document.getElementById('meter-no').value,
+    hajjNationality:document.getElementById('hajj-nationality').value,
+    fieldSupervisor:document.getElementById('field-supervisor').value,
+    buildingSupervisor:document.getElementById('building-supervisor').value,
+    hajjOpinion:document.getElementById('hajj-opinion').value,
+    otherNotes:document.getElementById('other-notes').value,
+    answers:{...answers},
+    photos:photos.map(p=>({name:p.name,data:p.data,time:p.time})),
     stats:{yes:y,no:v.length-y,total:41,answered:v.length,pct:v.length?Math.round(y/v.length*100):0}
   };
-  setConn(false,true);showSaving('جاري الإرسال...');
+
+  showSaving('جاري الإرسال...');
   document.getElementById('save-btn').disabled=true;
+
   try{
-    const getRes=await fetch(jsonbinUrl(cfg.binId),{headers:jsonbinHeaders(cfg.apiKey)});
-    const getData=await getRes.json();
-    const raw=getData.record||getData;
-    let existing=Array.isArray(raw)?raw:Array.isArray(raw.data)?raw.data:[];
-    existing.push(record);
-    const putRes=await fetch(jsonbinUrl(cfg.binId),{
-      method:'PUT',headers:{...jsonbinHeaders(cfg.apiKey),'Content-Type':'application/json'},
-      body:JSON.stringify({data:existing})
+    // Google Apps Script: POST as URL-encoded form data
+    const body=new URLSearchParams();
+    body.append('data', JSON.stringify(record));
+
+    const res=await fetch(scriptUrl, {
+      method:'POST',
+      headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body:body.toString()
     });
-    if(!putRes.ok)throw new Error(putRes.status);
-    setConn(true);hideSaving();document.getElementById('save-btn').disabled=false;
+
+    const result=await res.json();
+    if(result.status!=='ok')throw new Error(result.message||'خطأ غير معروف');
+
+    hideSaving();
+    document.getElementById('save-btn').disabled=false;
     toast('✅ تم الحفظ والإرسال بنجاح!','success');
     setTimeout(()=>{
-      const choice=confirm('تم الحفظ! ✅\n\nاضغط موافق لطباعة التقرير، أو إلغاء لبدء تقييم جديد.');
-      if(choice){printSavedRecord(record);}
-      else{resetForm();}
+      if(confirm('تم الحفظ! ✅\nاضغط موافق لطباعة التقرير، أو إلغاء لتقييم جديد.'))
+        printRecord(record);
+      else resetForm();
     },700);
   }catch(err){
-    hideSaving();setConn(false);document.getElementById('save-btn').disabled=false;
-    const q=JSON.parse(localStorage.getItem('hajj_offline')||'[]');q.push(record);localStorage.setItem('hajj_offline',JSON.stringify(q));
-    toast('⚠️ حُفظ محلياً — تحقق من الاتصال','warning');
+    hideSaving();
+    document.getElementById('save-btn').disabled=false;
+    // Save offline
+    const q=JSON.parse(localStorage.getItem('hajj_offline_v3')||'[]');
+    q.push(record);localStorage.setItem('hajj_offline_v3',JSON.stringify(q));
+    toast('⚠️ حُفظ محلياً ('+q.length+' سجل) — سيُرسل عند الاتصال','warning');
+    // Try to sync offline records
+    syncOffline();
+  }
+}
+
+async function syncOffline(){
+  const q=JSON.parse(localStorage.getItem('hajj_offline_v3')||'[]');
+  if(!q.length||!scriptUrl)return;
+  const sent=[];
+  for(const record of q){
+    try{
+      const body=new URLSearchParams();
+      body.append('data',JSON.stringify(record));
+      const r=await fetch(scriptUrl,{
+        method:'POST',
+        headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body:body.toString()
+      });
+      const res=await r.json();
+      if(res.status==='ok')sent.push(record.id);
+    }catch{}
+  }
+  if(sent.length){
+    const remaining=q.filter(r=>!sent.includes(r.id));
+    localStorage.setItem('hajj_offline_v3',JSON.stringify(remaining));
+    toast(`✅ تم إرسال ${sent.length} سجل محفوظ`,'success');
   }
 }
 
 function resetForm(){
   answers={};photos=[];document.getElementById('photos-grid').innerHTML='';
   ['permit-no','building-location','building-name','owner-name','tenant-name','meter-no','hajj-nationality','field-supervisor','building-supervisor','hajj-opinion','other-notes'].forEach(id=>document.getElementById(id).value='');
-  setDefaultDT();buildChecklist();updateSummary();updateProgress();window.scrollTo(0,0);toast('🔄 تم مسح النموذج');
-}
-
-function printSavedRecord(r){
-  const ITEMS_LOCAL=[{id:1,text:'توفر تصريح'},{id:2,text:'وجود تكدس حجاج المبنى'},{id:3,text:'توفر كاميرات مراقبة للمباني التي تزيد طاقتها عن 500 حاج'},{id:4,text:'وجود حارس أمن سعودي في المبنى'},{id:5,text:'توفير برادات لماء زمزم في مدخل المبنى'},{id:6,text:'التكييف والتهوية في كافة الغرف والممرات'},{id:7,text:'صلاحية دورات المياه وتوفر عبوة ثابتة للصابون'},{id:8,text:'توفر وسائل السلامة (سطول رمل وطفايات حريق)'},{id:9,text:'سخانات المياه'},{id:10,text:'شفاطات للهواء'},{id:11,text:'وجود طبق في أماكن غير مخصصة'},{id:12,text:'توفر أكواب ذات استخدام واحد'},{id:13,text:'توفر ستائر لجميع الغرف'},{id:14,text:'وجود مواد قابلة للإشتعال'},{id:15,text:'وجود قواطع خشبية بين الغرف'},{id:16,text:'توفر لوحة إرشادات السلامة وأرقام الطوارئ بلغة مستخدمي المبنى'},{id:17,text:'الطرق والمداخل متسعة لمرور آليات الإطفاء والإنقاذ'},{id:18,text:'سلامة الحوائط والأسقف من الشروخ والترشيح والتشققات'},{id:19,text:'التوافذ سليمة وبها سلك يمنع دخول الحشرات'},{id:20,text:'توفر حوض غسيل في كل مطبخ من المبنى'},{id:21,text:'سلامة المصعد ووجود عقد صيانة'},{id:22,text:'وجود افتراش بين الممرات'},{id:23,text:'استخدام الميزانين والأسطح للإسكان والتخزين'},{id:24,text:'استخدام أماكن مخصصة وتحويلها لغرف نوم'},{id:25,text:'وجود تسرب مياه من الخزان (السفلي - العلوي)'},{id:26,text:'طبلونات أو تمديدات كهرباء مكشوفة'},{id:27,text:'توفر لوحات إرشادية مضاءة لسلالم الطوارئ وكشافات كافية'},{id:28,text:'التأكد من تشغيل التيار في كافة عناصر المبنى'},{id:29,text:'توفر سلات مهملات في الغرف وحاويات حريق'},{id:30,text:'توفر غطاء محكم للخزان الأرضي'},{id:31,text:'توفر ملصق اتجاه القبلة في كل غرفة'},{id:32,text:'توفير برادات لماء عادي (تعمل)'},{id:33,text:'توفر مولد احتياطي يعمل بكفاءة وله عقد ساري'},{id:34,text:'توفر الإضاءة الكافية في أجزاء المبنى'},{id:35,text:'تركيب أدوات ترشيد المياه في المطابخ ودورات المياه'},{id:36,text:'وجود سرير معدني ومخدة ولحاف وخزانة في كل غرفة'},{id:37,text:'وجود عوائق أمام مخارج الطوارئ'},{id:38,text:'توفر لوحة عند كل غرفة برقمها وعدد المسموح بإسكانهم'},{id:39,text:'توفر وحدة استقبال وصندوق أمانات وصندوق مفاتيح'},{id:40,text:'توفر أغطية بالوعات سليمة محكمة الإغلاق بشبك يمنع الحشرات'},{id:41,text:'توفر سجاد يتناسب مع حجم الغرفة أو سجادة صلاة'}];
-  const ans=r.answers||{};
-  const p=r.stats?.pct||0;
-  const rightItems=ITEMS_LOCAL.filter(i=>i.id<=21);
-  const leftItems=ITEMS_LOCAL.filter(i=>i.id>=22);
-  const maxRows=Math.max(leftItems.length,rightItems.length);
-  const photosHTML=r.photos&&r.photos.length>0?`<div style="margin-top:8px;"><div style="font-weight:700;font-size:10pt;margin-bottom:4px;border-bottom:1px solid #999;padding-bottom:2px;">الصور التوثيقية (${r.photos.length})</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;">${r.photos.map(ph=>`<img src="${ph.data}" style="width:100%;height:65px;object-fit:cover;border:1px solid #ccc;border-radius:3px;">`).join('')}</div></div>`:'';
-  const win=window.open('','_blank');
-  win.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>نموذج رصد ملاحظات مساكن الحجاج</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:'Tajawal',sans-serif;color:#000;background:#fff;direction:rtl;}@page{size:A4;margin:10mm 8mm;}.page{width:100%;padding:6px;}.main-table{width:100%;border-collapse:collapse;border:1.5px solid #555;font-size:9pt;margin-bottom:5px;}.main-table th{background:#d0d8e4;padding:4px 5px;text-align:center;font-size:9pt;font-weight:700;border:1px solid #555;}.main-table td{border:1px solid #bbb;padding:2px 4px;vertical-align:middle;}.stats-bar{display:flex;gap:8px;margin-bottom:5px;}.stat-box{flex:1;border:1.5px solid;border-radius:4px;padding:4px 8px;text-align:center;}.stat-num{font-size:16pt;font-weight:800;line-height:1;}.stat-lbl{font-size:8pt;}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}</style></head><body><div class="page">
-  <table style="width:100%;border:2px solid #1a4a7a;border-collapse:collapse;margin-bottom:4px;"><tr>
-    <td style="width:110px;padding:5px 8px;border-left:1.5px solid #1a4a7a;text-align:center;"><div style="font-size:7pt;color:#1a4a7a;font-weight:700;line-height:1.4;"><div style="font-size:11pt;font-weight:800;">الراجحي</div><div>Al Rajhi</div><div style="font-size:6pt;">متن المناسك — MATEEN ALMANASIK</div></div></td>
-    <td style="text-align:center;padding:5px;"><div style="font-size:17pt;font-weight:800;color:#1a4a7a;">نموذج رصد الملاحظات على مساكن الحجاج</div><div style="margin-top:4px;display:inline-block;border:1.5px solid #1a4a7a;padding:2px 16px;font-size:10pt;font-weight:700;">إدارة اسكان مكة المكرمة</div></td>
-    <td style="width:100px;padding:5px 8px;border-right:1.5px solid #1a4a7a;text-align:center;"><div style="border:1.5px solid #1a4a7a;border-radius:3px;padding:3px 6px;font-size:8pt;font-weight:700;color:#1a4a7a;">مركز الضيافة</div><div style="margin-top:4px;font-size:7pt;color:#555;font-weight:700;">نعمل بإحسان</div></td>
-  </tr></table>
-  <table style="width:100%;border:1px solid #999;border-collapse:collapse;font-size:9pt;margin-bottom:4px;">
-    <tr><td style="padding:3px 6px;border-left:1px solid #ccc;"><span style="font-weight:700;">اليوم / تاريخ الزيارة: </span><span style="border-bottom:1px solid #555;display:inline-block;min-width:80px;padding:0 4px;">${r.visitDate||''}</span></td><td style="padding:3px 6px;border-left:1px solid #ccc;"><span style="font-weight:700;">وقت الزيارة: </span><span style="border-bottom:1px solid #555;display:inline-block;min-width:50px;padding:0 4px;">${r.visitTime||''}</span></td><td style="padding:3px 6px;"><span style="font-weight:700;">رقم التصريح: </span><span style="border-bottom:1px solid #555;display:inline-block;min-width:80px;padding:0 4px;">${r.permitNo||''}</span></td></tr>
-    <tr style="border-top:1px solid #ccc;"><td style="padding:3px 6px;border-left:1px solid #ccc;"><span style="font-weight:700;">اسم المالك: </span><span style="border-bottom:1px solid #555;display:inline-block;min-width:100px;padding:0 4px;">${r.ownerName||''}</span></td><td style="padding:3px 6px;border-left:1px solid #ccc;"><span style="font-weight:700;">اسم المستأجر: </span><span style="border-bottom:1px solid #555;display:inline-block;min-width:100px;padding:0 4px;">${r.tenantName||''}</span></td><td style="padding:3px 6px;"><span style="font-weight:700;">موقع العمارة: </span><span style="border-bottom:1px solid #555;display:inline-block;min-width:80px;padding:0 4px;">${r.buildingLocation||''}</span></td></tr>
-    <tr style="border-top:1px solid #ccc;"><td colspan="3" style="padding:3px 6px;"><span style="font-weight:700;">اسم الفندق/العمارة: </span><span style="border-bottom:1px solid #555;display:inline-block;min-width:100px;padding:0 4px;">${r.buildingName||''}</span>  <span style="font-weight:700;margin-right:16px;">جنسية الحجاج: </span><span style="border-bottom:1px solid #555;display:inline-block;min-width:80px;padding:0 4px;">${r.hajjNationality||''}</span>  <span style="font-weight:700;margin-right:16px;">رقم عداد الكهرباء: </span><span style="border-bottom:1px solid #555;display:inline-block;min-width:70px;padding:0 4px;">${r.meterNo||''}</span></td></tr>
-  </table>
-  <table class="main-table"><thead><tr><th style="width:22px;">م</th><th>الملاحظات</th><th style="width:30px;">نعم</th><th style="width:30px;">لا</th><th style="width:80px;">الحالة</th><th style="width:22px;">م</th><th>الملاحظات</th><th style="width:30px;">نعم</th><th style="width:30px;">لا</th><th style="width:80px;">الحالة</th></tr></thead><tbody>
-  ${Array.from({length:maxRows},(_,i)=>{const R=rightItems[i],L=leftItems[i];function bc(item){if(!item)return'<td></td><td></td><td></td><td></td><td></td>';const a=ans[item.id];const isY=a===true,isN=a===false;const bg=isY?'#f0fdf4':isN?'#fef2f2':'';return`<td style="text-align:center;background:#f5f5f5;font-weight:700;">${item.id}</td><td style="background:${bg};">${item.text}</td><td style="text-align:center;font-size:13pt;">${isY?'☑':'☐'}</td><td style="text-align:center;font-size:13pt;">${isN?'☑':'☐'}</td><td></td>`;}return`<tr style="border-bottom:1px solid #ddd;">${bc(R)}${bc(L)}</tr>`;}).join('')}
-  </tbody></table>
-  <div class="stats-bar">
-    <div class="stat-box" style="border-color:#16a34a;background:#f0fdf4;"><div class="stat-num" style="color:#16a34a;">${r.stats?.yes||0}</div><div class="stat-lbl">متوفر ✓</div></div>
-    <div class="stat-box" style="border-color:#dc2626;background:#fef2f2;"><div class="stat-num" style="color:#dc2626;">${r.stats?.no||0}</div><div class="stat-lbl">غير متوفر ✗</div></div>
-    <div class="stat-box" style="border-color:#1a4a7a;background:#e8f0f8;flex:2;"><div class="stat-num" style="color:#1a4a7a;">${p}%</div><div class="stat-lbl">نسبة الجاهزية الإجمالية</div></div>
-  </div>
-  <table style="width:100%;border:1px solid #999;border-collapse:collapse;margin-bottom:5px;font-size:9pt;"><tr>
-    <td style="padding:3px 6px;border-left:1px solid #ccc;width:50%;vertical-align:top;"><div style="font-weight:700;margin-bottom:4px;">رأي الحاج :</div><div style="border-bottom:1px solid #bbb;min-height:16px;margin-bottom:4px;">${r.hajjOpinion||''}</div><div style="border-bottom:1px solid #bbb;min-height:16px;margin-bottom:4px;"></div><div style="border-bottom:1px solid #bbb;min-height:16px;"></div></td>
-    <td style="padding:3px 6px;width:50%;vertical-align:top;"><div style="font-weight:700;margin-bottom:4px;">ملاحظات أخرى :</div><div style="border-bottom:1px solid #bbb;min-height:16px;margin-bottom:4px;">${r.otherNotes||''}</div><div style="border-bottom:1px solid #bbb;min-height:16px;margin-bottom:4px;"></div><div style="border-bottom:1px solid #bbb;min-height:16px;"></div></td>
-  </tr></table>
-  <table style="width:100%;border:1px solid #999;border-collapse:collapse;font-size:9pt;"><tr>
-    <td style="padding:6px 10px;border-left:1px solid #ccc;width:50%;"><div style="font-weight:700;font-size:10pt;margin-bottom:6px;">مشرف ميداني</div><div style="display:flex;gap:4px;margin-bottom:5px;"><span style="font-weight:600;">الاسـم :</span><span style="border-bottom:1px solid #888;flex:1;padding:0 4px;">${r.fieldSupervisor||r.user?.name||''}</span></div><div style="display:flex;gap:4px;margin-bottom:5px;"><span style="font-weight:600;">التوقيـع :</span><span style="border-bottom:1px solid #888;flex:1;"></span></div><div style="display:flex;gap:4px;"><span style="font-weight:600;">التـاريـخ :</span><span style="border-bottom:1px solid #888;flex:1;padding:0 4px;">${r.visitDate||''}</span></div></td>
-    <td style="padding:6px 10px;width:50%;"><div style="font-weight:700;font-size:10pt;margin-bottom:6px;">مسؤول المبنى السكني (مشرف)</div><div style="display:flex;gap:4px;margin-bottom:5px;"><span style="font-weight:600;">الاسـم :</span><span style="border-bottom:1px solid #888;flex:1;padding:0 4px;">${r.buildingSupervisor||''}</span></div><div style="display:flex;gap:4px;margin-bottom:5px;"><span style="font-weight:600;">التوقيـع :</span><span style="border-bottom:1px solid #888;flex:1;"></span></div><div style="display:flex;gap:4px;"><span style="font-weight:600;">التـاريـخ :</span><span style="border-bottom:1px solid #888;flex:1;padding:0 4px;">${r.visitDate||''}</span></div></td>
-  </tr></table>
-  ${photosHTML}
-  <div style="margin-top:5px;display:flex;justify-content:space-between;font-size:8pt;color:#888;border-top:1px solid #ddd;padding-top:3px;"><div>وقت الطباعة: ${new Date().toLocaleString('ar-SA')}</div><div>المشرف: ${r.user?.name||''} — ${r.user?.dept||''}</div></div>
-</div><script>window.onload=()=>window.print()<\/script></body></html>`);
-  win.document.close();
+  setDefaultDT();buildChecklist();updateSummary();updateProgress();window.scrollTo(0,0);
+  toast('🔄 تم مسح النموذج');
+  syncOffline();
 }
 
 function showSaving(msg){document.getElementById('saving-msg').textContent=msg;document.getElementById('saving-overlay').classList.add('show');}
 function hideSaving(){document.getElementById('saving-overlay').classList.remove('show');}
-function toast(msg,type=''){const el=document.getElementById('toast');el.textContent=msg;el.className='toast show'+(type?' '+type:'');setTimeout(()=>el.className='toast',2900);}
+function toast(msg,type=''){const el=document.getElementById('toast');el.textContent=msg;el.className='toast show'+(type?' '+type:'');setTimeout(()=>el.className='toast',3000);}
+
+function printRecord(r){
+  const ans=r.answers||{};const p=r.stats?.pct||0;
+  const rightI=ITEMS.filter(i=>i.id<=21),leftI=ITEMS.filter(i=>i.id>=22);
+  const mx=Math.max(rightI.length,leftI.length);
+  const photosH=r.photos?.length?`<div style="margin-top:8px"><div style="font-weight:700;font-size:10pt;margin-bottom:4px;border-bottom:1px solid #999;">الصور التوثيقية (${r.photos.length})</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px">${r.photos.map(ph=>`<img src="${ph.data}" style="width:100%;height:65px;object-fit:cover;border:1px solid #ccc;border-radius:3px">`).join('')}</div></div>`:'';
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>نموذج رصد مساكن الحجاج</title><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Tajawal',sans-serif;color:#000;background:#fff;direction:rtl}@page{size:A4;margin:10mm 8mm}.mt{width:100%;border-collapse:collapse;border:1.5px solid #555;font-size:9pt;margin-bottom:5px}.mt th{background:#d0d8e4;padding:4px 5px;text-align:center;font-size:9pt;font-weight:700;border:1px solid #555}.mt td{border:1px solid #bbb;padding:2px 4px;vertical-align:middle}.sb-bar{display:flex;gap:8px;margin-bottom:5px}.sb{flex:1;border:1.5px solid;border-radius:4px;padding:4px 8px;text-align:center}.sn{font-size:16pt;font-weight:800;line-height:1}.sl{font-size:8pt}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style></head><body>
+  <table style="width:100%;border:2px solid #1a4a7a;border-collapse:collapse;margin-bottom:4px"><tr>
+    <td style="width:110px;padding:5px 8px;border-left:1.5px solid #1a4a7a;text-align:center;font-size:7pt;color:#1a4a7a;font-weight:700;line-height:1.4"><div style="font-size:11pt;font-weight:800">الراجحي</div><div>Al Rajhi</div><div style="font-size:6pt">متن المناسك — MATEEN ALMANASIK</div></td>
+    <td style="text-align:center;padding:5px"><div style="font-size:17pt;font-weight:800;color:#1a4a7a">نموذج رصد الملاحظات على مساكن الحجاج</div><div style="margin-top:4px;display:inline-block;border:1.5px solid #1a4a7a;padding:2px 16px;font-size:10pt;font-weight:700">إدارة اسكان مكة المكرمة</div></td>
+    <td style="width:100px;padding:5px 8px;border-right:1.5px solid #1a4a7a;text-align:center"><div style="border:1.5px solid #1a4a7a;border-radius:3px;padding:3px 6px;font-size:8pt;font-weight:700;color:#1a4a7a">مركز الضيافة</div><div style="margin-top:4px;font-size:7pt;font-weight:700">نعمل بإحسان</div></td>
+  </tr></table>
+  <table style="width:100%;border:1px solid #999;border-collapse:collapse;font-size:9pt;margin-bottom:4px">
+    <tr><td style="padding:3px 6px;border-left:1px solid #ccc"><span style="font-weight:700">تاريخ الزيارة: </span>${r.visitDate||''}</td><td style="padding:3px 6px;border-left:1px solid #ccc"><span style="font-weight:700">وقت الزيارة: </span>${r.visitTime||''}</td><td style="padding:3px 6px"><span style="font-weight:700">رقم التصريح: </span>${r.permitNo||''}</td></tr>
+    <tr style="border-top:1px solid #ccc"><td style="padding:3px 6px;border-left:1px solid #ccc"><span style="font-weight:700">اسم المالك: </span>${r.ownerName||''}</td><td style="padding:3px 6px;border-left:1px solid #ccc"><span style="font-weight:700">اسم المستأجر: </span>${r.tenantName||''}</td><td style="padding:3px 6px"><span style="font-weight:700">الموقع: </span>${r.buildingLocation||''}</td></tr>
+    <tr style="border-top:1px solid #ccc"><td colspan="3" style="padding:3px 6px"><span style="font-weight:700">اسم الفندق/العمارة: </span>${r.buildingName||''}  <span style="font-weight:700;margin-right:14px">جنسية الحجاج: </span>${r.hajjNationality||''}  <span style="font-weight:700;margin-right:14px">رقم العداد: </span>${r.meterNo||''}  <span style="font-weight:700;margin-right:14px">المشرف: </span>${r.user?.name||''}</td></tr>
+  </table>
+  <table class="mt"><thead><tr><th style="width:22px">م</th><th>الملاحظات</th><th style="width:28px">نعم</th><th style="width:28px">لا</th><th style="width:22px">م</th><th>الملاحظات</th><th style="width:28px">نعم</th><th style="width:28px">لا</th></tr></thead><tbody>
+  ${Array.from({length:mx},(_,i)=>{const R=rightI[i],L=leftI[i];function bc(it){if(!it)return'<td></td><td></td><td></td><td></td>';const a=ans[it.id];const iY=a===true,iN=a===false;return`<td style="text-align:center;background:#f5f5f5;font-weight:700">${it.id}</td><td style="background:${iY?'#f0fdf4':iN?'#fef2f2':''}">${it.text}</td><td style="text-align:center;font-size:12pt">${iY?'☑':'☐'}</td><td style="text-align:center;font-size:12pt">${iN?'☑':'☐'}</td>`;}return`<tr style="border-bottom:1px solid #ddd">${bc(R)}${bc(L)}</tr>`;}).join('')}
+  </tbody></table>
+  <div class="sb-bar">
+    <div class="sb" style="border-color:#16a34a;background:#f0fdf4"><div class="sn" style="color:#16a34a">${r.stats?.yes||0}</div><div class="sl">متوفر ✓</div></div>
+    <div class="sb" style="border-color:#dc2626;background:#fef2f2"><div class="sn" style="color:#dc2626">${r.stats?.no||0}</div><div class="sl">غير متوفر ✗</div></div>
+    <div class="sb" style="border-color:#1a4a7a;background:#e8f0f8;flex:2"><div class="sn" style="color:#1a4a7a">${p}%</div><div class="sl">نسبة الجاهزية الإجمالية</div></div>
+  </div>
+  <table style="width:100%;border:1px solid #999;border-collapse:collapse;margin-bottom:5px;font-size:9pt"><tr>
+    <td style="padding:3px 6px;border-left:1px solid #ccc;width:50%;vertical-align:top"><div style="font-weight:700;margin-bottom:4px">رأي الحاج :</div><div style="border-bottom:1px solid #bbb;min-height:16px;margin-bottom:4px">${r.hajjOpinion||''}</div><div style="border-bottom:1px solid #bbb;min-height:16px"></div></td>
+    <td style="padding:3px 6px;width:50%;vertical-align:top"><div style="font-weight:700;margin-bottom:4px">ملاحظات أخرى :</div><div style="border-bottom:1px solid #bbb;min-height:16px;margin-bottom:4px">${r.otherNotes||''}</div><div style="border-bottom:1px solid #bbb;min-height:16px"></div></td>
+  </tr></table>
+  <table style="width:100%;border:1px solid #999;border-collapse:collapse;font-size:9pt"><tr>
+    <td style="padding:6px 10px;border-left:1px solid #ccc;width:50%"><div style="font-weight:700;margin-bottom:6px">مشرف ميداني</div><div style="display:flex;gap:4px;margin-bottom:5px"><span style="font-weight:600">الاسـم :</span><span style="border-bottom:1px solid #888;flex:1;padding:0 4px">${r.fieldSupervisor||r.user?.name||''}</span></div><div style="display:flex;gap:4px;margin-bottom:5px"><span style="font-weight:600">التوقيـع :</span><span style="border-bottom:1px solid #888;flex:1"></span></div><div style="display:flex;gap:4px"><span style="font-weight:600">التـاريـخ :</span><span style="border-bottom:1px solid #888;flex:1;padding:0 4px">${r.visitDate||''}</span></div></td>
+    <td style="padding:6px 10px;width:50%"><div style="font-weight:700;margin-bottom:6px">مسؤول المبنى السكني (مشرف)</div><div style="display:flex;gap:4px;margin-bottom:5px"><span style="font-weight:600">الاسـم :</span><span style="border-bottom:1px solid #888;flex:1;padding:0 4px">${r.buildingSupervisor||''}</span></div><div style="display:flex;gap:4px;margin-bottom:5px"><span style="font-weight:600">التوقيـع :</span><span style="border-bottom:1px solid #888;flex:1"></span></div><div style="display:flex;gap:4px"><span style="font-weight:600">التـاريـخ :</span><span style="border-bottom:1px solid #888;flex:1;padding:0 4px">${r.visitDate||''}</span></div></td>
+  </tr></table>
+  ${photosH}
+  <div style="margin-top:5px;display:flex;justify-content:space-between;font-size:8pt;color:#888;border-top:1px solid #ddd;padding-top:3px"><div>وقت الطباعة: ${new Date().toLocaleString('ar-SA')}</div><div>${r.user?.name||''} — ${r.user?.dept||''}</div></div>
+  <script>window.onload=()=>window.print()<\/script></body></html>`);
+  win.document.close();
+}
 </script>
 </body>
 </html>
